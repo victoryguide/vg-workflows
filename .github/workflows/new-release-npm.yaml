@@ -1,0 +1,112 @@
+name: Create new release for docker repo
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Node version used in actions/setup-node"
+        type: string
+        required: false
+        default: "16.x"
+    secrets:
+      node-auth-token:
+        description: "Token used to authenticate with github NPM repo"
+        type: string
+        required: true
+      gha-repo-token:
+        description: "Personal access token with repo access"
+        type: string
+        required: true
+      gha-pkg-token:
+        description: "Personal access token with read:packages access"
+        type: string
+        required: true
+
+env:
+  REGISTRY: https://npm.pkg.github.com
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  create-new-version-info:
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.version-info.outputs.new_tag }}
+      new_version: ${{ steps.version-info.outputs.new_version }}
+      previous_version: ${{ steps.version-info.outputs.previous_version }}
+      release_type: ${{ steps.version-info.outputs.release_type }}
+      changelog: ${{ steps.version-info.outputs.changelog }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get new version information
+        id: version-info
+        uses: mathieudutour/github-tag-action@v5.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main
+          dry_run: true
+
+  update-package-version:
+    runs-on: ubuntu-latest
+    needs: create-new-version-info
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: ${{ env.REGISTRY }}
+
+      - name: Update version in package.json
+        run: |
+          jq ".version = \"${{ steps.get_version.outputs.new_version }}\"" package.json > package.json.tmp && mv package.json.tmp package.json &&
+          if [[ -n $(git diff -- package.json) ]]; then
+            git config --global user.name 'github-actions'
+            git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            npm i --package-lock-only
+            git add package.json
+            git add package-lock.json
+            git commit --no-verify -m "chore: update version in npm package files (${{ steps.get_version.outputs.previous_version }} -> ${{ steps.get_version.outputs.new_version }}) [skip ci]"
+            git push --no-verify
+          fi
+
+  build-and-push-new-package:
+    runs-on: ubuntu-latest
+    needs: [create-new-version-info, update-package-version]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "main"
+          token: ${{ secrets.gha_pat }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ inputs.node-version }}
+          registry-url: ${{ env.REGISTRY }}
+
+      - name: Publish package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  create-new-release:
+    runs-on: ubuntu-latest
+    needs: [create-new-version-info, build-and-push-new-package]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create a GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.create-new-version-info.outputs.new_tag }}
+          release_name: Release ${{ needs.create-new-version-info.outputs.new_tag }}
+          body: ${{ needs.create-new-version-info.outputs.changelog }}
