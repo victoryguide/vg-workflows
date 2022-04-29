@@ -46,7 +46,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          build-args: ${{ inputs.build-args }}
+          build-args: |
+            --build-arg VERSION="${{ steps.version-info.outputs.new_version }}"
+            ${{ inputs.build-args }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version-info.outputs.new_version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
