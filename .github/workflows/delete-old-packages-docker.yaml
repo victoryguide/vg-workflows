@@ -2,10 +2,6 @@ name: Delete old packages
 
 on:
   workflow_call:
-    secrets:
-      gha-pkg-token:
-        description: "Personal access token with delete:packages permission"
-        required: true
 
 env:
   IMAGE_NAME: ${{ github.repository }}
@@ -32,4 +28,4 @@ jobs:
           org-name: victoryguide
           keep-at-least: 1
           skip-tags: latest
-          token: ${{ secrets.gha-pkg-token }}
+          token: ${{ secrets.GHA_PKG_TOKEN }}

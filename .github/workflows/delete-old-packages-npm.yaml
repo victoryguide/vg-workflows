@@ -2,10 +2,6 @@ name: Delete old packages
 
 on:
   workflow_call:
-    secrets:
-      gha-pkg-token:
-        description: "Personal access token with delete:packages permission"
-        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -26,7 +22,7 @@ jobs:
       - name: Delete old packages
         uses: actions/delete-package-versions@v3
         with:
-          token: ${{ secrets.gha-pkg-token }}
+          token: ${{ secrets.GHA_PKG_TOKEN }}
           package-name: ${{ steps.extract_package_name.outputs.package_name }}
           min-versions-to-keep: 10
           ignore-versions: ":latest"
