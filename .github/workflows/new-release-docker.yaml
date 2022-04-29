@@ -88,5 +88,5 @@ jobs:
         with:
           token: ${{ secrets.gha-pkg-token }}
           package-name: ${{ inputs.package-name }}
-          min-versions-to-keep: 2
+          min-versions-to-keep: 1
           ignore-versions: ":latest"
