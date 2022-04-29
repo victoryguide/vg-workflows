@@ -1,4 +1,4 @@
-name: Create new release for docker repo
+name: Delete old packages
 
 on:
   workflow_call:
@@ -17,7 +17,7 @@ jobs:
     needs: [build-and-push-new-package]
 
     steps:
-      - name: Remove old packages
+      - name: Delete old packages
         uses: snok/container-retention-policy@v1
         with:
           image-names: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}

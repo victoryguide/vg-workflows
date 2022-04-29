@@ -1,4 +1,4 @@
-name: Create new release for docker repo
+name: Delete old packages
 
 on:
   workflow_call:
@@ -24,7 +24,7 @@ jobs:
           echo "Set package_name to ${package_name}"
           echo "::set-output name=package_name::${package_name}"
 
-      - name: Remove old packages
+      - name: Delete old packages
         uses: actions/delete-package-versions@v3
         with:
           token: ${{ secrets.gha-pkg-token }}
