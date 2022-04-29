@@ -6,7 +6,6 @@ on:
       gha-pkg-token:
         description: "Personal access token with delete:packages permission"
         required: true
-        type: string
 
 env:
   IMAGE_NAME: ${{ github.repository }}

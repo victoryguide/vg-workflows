@@ -6,7 +6,6 @@ on:
       build-args:
         description: "List of build-time variables (https://github.com/docker/build-push-action#inputs)"
         required: false
-        type: string
 
 env:
   REGISTRY: ghcr.io
