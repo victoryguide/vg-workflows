@@ -2,7 +2,7 @@ name: Create new release for docker repo
 
 on:
   workflow_call:
-    inputs:
+    secrets:
       build-args:
         description: "List of build-time variables (https://github.com/docker/build-push-action#inputs)"
         required: false
@@ -48,7 +48,7 @@ jobs:
           push: true
           build-args: |
             --build-arg VERSION="${{ steps.version-info.outputs.new_version }}"
-            ${{ inputs.build-args }}
+            ${{ secrets.build-args }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version-info.outputs.new_version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
