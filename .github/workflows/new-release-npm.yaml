@@ -3,32 +3,11 @@ name: Create new release for npm repo
 on:
   workflow_call:
     inputs:
-      node-version:
-        description: "Node version used in actions/setup-node"
-        type: string
-        required: false
-        default: "16.x"
-      package-name:
-        description: "Name of npm package"
-        type: string
-        required: true
-    secrets:
-      node-auth-token:
-        description: "Token used to authenticate with github NPM repo"
-        type: string
-        required: true
-      gha-repo-token:
-        description: "Personal access token with repo access"
-        type: string
-        required: true
-      gha-pkg-token:
-        description: "Personal access token with read:packages access"
-        type: string
-        required: true
 
 env:
   REGISTRY: https://npm.pkg.github.com
   IMAGE_NAME: ${{ github.repository }}
+  NODE_VERSION: "16"
 
 jobs:
   create-new-version-info:
@@ -42,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: "main"
 
       - name: Get new version information
         id: version-info
@@ -57,22 +38,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: "main"
 
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ inputs.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: ${{ env.REGISTRY }}
+
+      - uses: fregante/setup-git-user@v1
 
       - name: Update version in package.json
         run: |
-          jq ".version = \"${{ steps.get_version.outputs.new_version }}\"" package.json > package.json.tmp && mv package.json.tmp package.json &&
+          jq ".version = \"${{ needs.create-new-version-info.outputs.new_version }}\"" package.json > package.json.tmp && mv package.json.tmp package.json &&
           if [[ -n $(git diff -- package.json) ]]; then
-            git config --global user.name 'github-actions'
-            git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
             npm i --package-lock-only
             git add package.json
             git add package-lock.json
-            git commit --no-verify -m "chore: update version in npm package files (${{ steps.get_version.outputs.previous_version }} -> ${{ steps.get_version.outputs.new_version }}) [skip ci]"
+            git commit --no-verify -m "chore: update version in npm package files (${{ needs.create-new-version-info.outputs.previous_version }} -> ${{ needs.create-new-version-info.outputs.new_version }}) [skip ci]"
             git push --no-verify
           fi
 
@@ -87,12 +70,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: "main"
-          token: ${{ secrets.gha_pat }}
 
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ inputs.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: ${{ env.REGISTRY }}
+          cache: "npm"
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish package
         run: npm publish
@@ -105,6 +92,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: "main"
 
       - name: Create a GitHub release
         uses: actions/create-release@v1

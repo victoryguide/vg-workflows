@@ -3,15 +3,6 @@ name: Create new release for docker repo
 on:
   workflow_call:
     inputs:
-      package-name:
-        description: Name of github package (e.g. vg-db)
-        type: string
-        required: false
-        default: ${{ github.event.repository.name }}
-    secrets:
-      gha-pkg-token:
-        description: "Personal access token with read:packages access"
-        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -78,19 +69,3 @@ jobs:
           tag_name: ${{ needs.create-new-version-info.outputs.new_tag }}
           release_name: Release ${{ needs.create-new-version-info.outputs.new_tag }}
           body: ${{ needs.create-new-version-info.outputs.changelog }}
-
-  delete-old-packages:
-    runs-on: ubuntu-latest
-    needs: [build-and-push-new-package]
-
-    steps:
-      - uses: snok/container-retention-policy@v1
-        with:
-          image-names: ${{ inputs.package-name }}
-          cut-off: 36 hours ago UTC
-          timestamp-to-use: updated_at
-          account-type: org
-          org-name: google
-          keep-at-least: 1
-          skip-tags: latest
-          token: ${{ secrets.PAT }}

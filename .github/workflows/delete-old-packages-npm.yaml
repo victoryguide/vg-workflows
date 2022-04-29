@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       gha-pkg-token:
-        description: "Personal access token with read:packages access"
+        description: "Personal access token with delete:packages permission"
         required: true
 
 env:
