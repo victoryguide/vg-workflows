@@ -20,7 +20,7 @@ jobs:
         uses: snok/container-retention-policy@v1
         with:
           image-names: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          cut-off: 1 hour ago
+          cut-off: 1 hour ago UTC-4
           timestamp-to-use: updated_at
           account-type: org
           org-name: victoryguide
