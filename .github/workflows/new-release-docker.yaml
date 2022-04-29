@@ -87,6 +87,6 @@ jobs:
       - uses: actions/delete-package-versions@v3
         with:
           token: ${{ secrets.gha-pkg-token }}
-          package-name: $ {{ inputs.package-name }}
+          package-name: ${{ inputs.package-name }}
           min-versions-to-keep: 2
           ignore-versions: ":latest"
