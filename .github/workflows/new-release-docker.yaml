@@ -84,9 +84,13 @@ jobs:
     needs: [build-and-push-new-package]
 
     steps:
-      - uses: actions/delete-package-versions@v3
+      - uses: snok/container-retention-policy@v1
         with:
-          token: ${{ secrets.gha-pkg-token }}
-          package-name: ${{ inputs.package-name }}
-          min-versions-to-keep: 1
-          ignore-versions: ":latest"
+          image-names: ${{ inputs.package-name }}
+          cut-off: 36 hours ago UTC
+          timestamp-to-use: updated_at
+          account-type: org
+          org-name: google
+          keep-at-least: 1
+          skip-tags: latest
+          token: ${{ secrets.PAT }}

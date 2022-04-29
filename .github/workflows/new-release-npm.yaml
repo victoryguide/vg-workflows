@@ -8,6 +8,10 @@ on:
         type: string
         required: false
         default: "16.x"
+      package-name:
+        description: "Name of npm package"
+        type: string
+        required: true
     secrets:
       node-auth-token:
         description: "Token used to authenticate with github NPM repo"

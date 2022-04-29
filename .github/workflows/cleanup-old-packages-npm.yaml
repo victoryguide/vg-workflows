@@ -1,0 +1,33 @@
+name: Create new release for docker repo
+
+on:
+  workflow_call:
+    secrets:
+      gha-pkg-token:
+        description: "Personal access token with read:packages access"
+        required: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  delete-old-packages:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-new-package]
+
+    steps:
+      - name: Extract package name
+        id: extract_package_name
+        run: |
+          package_name=`echo ${{ env.IMAGE_NAME }} | sed "s/^.*vg-\(.*\)/\1/"`
+          echo "Set package_name to ${package_name}"
+          echo "::set-output name=package_name::${package_name}"
+
+      - name: Remove old packages
+        uses: actions/delete-package-versions@v3
+        with:
+          token: ${{ secrets.gha-pkg-token }}
+          package-name: ${{ steps.extract_package_name.outputs.package_name }}
+          min-versions-to-keep: 1
+          ignore-versions: ":latest"
