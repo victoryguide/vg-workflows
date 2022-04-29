@@ -2,7 +2,6 @@ name: Create new release for docker repo
 
 on:
   workflow_call:
-    inputs:
 
 env:
   REGISTRY: ghcr.io
