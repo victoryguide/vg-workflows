@@ -86,8 +86,10 @@ jobs:
       - name: Check build-args looks correct
         run: |
           echo "${{ inputs.build-args }}"
+          echo "$TESTING_THIS"
           echo "$BUILD_ARGS_WITH_SECRETS"
         env:
+          TESTING_THIS: hi
           BUILD_ARGS_WITH_SECRETS: ${{ steps.build-args-with-secrets.outputs.build-args }}
 
       - name: Build and push Docker image
