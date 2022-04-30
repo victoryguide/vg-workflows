@@ -51,7 +51,7 @@ jobs:
           for key in `echo $SECRETS_CONTEXT | jq -r 'keys | @sh' | sed "s/'//g"`
           do
             value=`echo $SECRETS_CONTEXT | jq -r ".${key}"`;
-            build_args=`echo "$build_args" | sed "s#\${ secrets.${key} }#${value}#g"`;
+            build_args=$(echo "$build_args" | sed "s#\${ secrets.${key} }#${value}#g");
           done
           build_args="${build_args//'%'/'%25'}"
           build_args="${build_args//$'\n'/'%0A'}"
