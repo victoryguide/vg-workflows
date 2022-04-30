@@ -4,7 +4,9 @@ on:
   workflow_call:
     inputs:
       build-args:
-        description: "List of build-time variables (https://github.com/docker/build-push-action#inputs)"
+        description: |
+          List of build-time variables (https://github.com/docker/build-push-action#inputs).
+          Use single brace for secrets (e.g. ${ secrets.VARNAME } instead of ${{ secrets.VARNAME }}).
         required: false
         type: string
 
@@ -42,13 +44,35 @@ jobs:
           release_branches: main
           dry_run: true
 
+      - name: Replace placeholder secrets in build-args with real values
+        id: build-args-with-secrets
+        run: |
+          build_args="$BUILD_ARGS"
+          for key in `echo $SECRETS_CONTEXT | jq -r 'keys | @sh' | sed "s/'//g"`
+          do
+            value=`echo $SECRETS_CONTEXT | jq -r ".${key}"`;
+            build_args=`echo "$build_args" | sed "s#\${ secrets.${key} }#${value}#g"`;
+          done
+          build_args="${build_args//'%'/'%25'}"
+          build_args="${build_args//$'\n'/'%0A'}"
+          build_args="${build_args//$'\r'/'%0D'}"
+          echo "::set-output name=build-args::${build_args}"
+        env:
+          BUILD_ARGS: ${{ inputs.build-args }}
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+
+      - name: Check build-args looks correct
+        run: |
+          echo "${{ inputs.build-args }}"
+          echo "${{ steps.build-args-with-secrets.outputs.build-args }}"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           push: true
           build-args: |
             --build-arg VERSION="${{ steps.version-info.outputs.new_version }}"
-            ${{ inputs.build-args }}
+            ${{ steps.build-args-with-secrets.outputs.build-args }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version-info.outputs.new_version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
