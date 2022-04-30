@@ -84,9 +84,12 @@ jobs:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
       - name: Check build-args looks correct
-        run: echo "$TESTING_THIS"
+        run: |
+          echo "$BUILD_ARGS_ORIG"
+          echo "$BUILD_ARGS_SECRETS"
         env:
-          TESTING_THIS: hi
+          BUILD_ARGS_ORIG: ${{ inputs.build-args }}
+          BUILD_ARGS_SECRETS: ${{ steps.build-args-with-secrets.outputs.build-args }}
 
       # - name: Build and push Docker image
       #   uses: docker/build-push-action@v2
