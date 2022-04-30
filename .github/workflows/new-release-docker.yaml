@@ -84,9 +84,7 @@ jobs:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
 
       - name: Check build-args looks correct
-        run: |
-          echo "${{ inputs.build-args }}"
-          echo "$TESTING_THIS"
+        run: echo "$TESTING_THIS"
         env:
           TESTING_THIS: hi
 
