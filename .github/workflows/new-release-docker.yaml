@@ -88,7 +88,7 @@ jobs:
         with:
           push: true
           build-args: |
-            --build-arg VERSION="${{ steps.version-info.outputs.new_version }}"
+            VERSION="${{ steps.version-info.outputs.new_version }}"
             ${{ steps.build-args-with-secrets.outputs.build-args }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version-info.outputs.new_version }}
