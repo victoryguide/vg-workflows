@@ -2,6 +2,10 @@ name: Create new release for npm repo
 
 on:
   workflow_call:
+    secrets:
+      gha-pkg-token:
+        description: "Personal access token with read:packages permission"
+        required: true
 
 env:
   REGISTRY: https://npm.pkg.github.com
@@ -41,7 +45,7 @@ jobs:
 
       - run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GHA_PKG_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.gha-pkg-token }}
 
       - name: Update version in package.json
         run: |
