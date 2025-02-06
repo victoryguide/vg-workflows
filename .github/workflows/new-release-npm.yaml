@@ -8,6 +8,7 @@ on:
         required: true
     inputs:
       branch:
+        type: string
         description: "The branch to create a release from"
         required: true
         default: "main"
