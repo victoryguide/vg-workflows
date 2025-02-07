@@ -49,7 +49,7 @@ jobs:
 
       - run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.gha-pkg-token }}
+          GHA_PKG_TOKEN: ${{ secrets.gha-pkg-token }}
 
       - name: Update version in package.json
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Publish package
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHA_PKG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create a GitHub release
         uses: actions/create-release@v1
