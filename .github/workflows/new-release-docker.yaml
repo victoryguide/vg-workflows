@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         description: "The branch to create a release from"
-        required: true
+        required: false
         default: "main"
       build-args:
         description: |

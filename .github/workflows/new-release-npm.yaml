@@ -10,7 +10,7 @@ on:
       branch:
         type: string
         description: "The branch to create a release from"
-        required: true
+        required: false
         default: "main"
 
 env:
