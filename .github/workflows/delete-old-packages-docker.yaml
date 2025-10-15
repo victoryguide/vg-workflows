@@ -20,7 +20,7 @@ jobs:
         run: |
           package_name=`echo ${{ env.IMAGE_NAME }} | sed "s/^.*\(vg-.*\)/\1/"`
           echo "Set package_name to ${package_name}"
-          echo "::set-output name=package_name::${package_name}"
+          echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
 
       - name: Delete old packages
         uses: snok/container-retention-policy@v1
