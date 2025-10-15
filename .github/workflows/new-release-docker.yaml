@@ -86,7 +86,7 @@ jobs:
               name="$(basename "${dir}")"
               dockerfile="${dir}/Dockerfile"
               if [ -f "$dockerfile" ]; then
-                obj=$(jq -n --arg context "$dir" \
+                obj=$(jq -n --arg context "." \
                            --arg dockerfile "$dockerfile" \
                            --arg suffix "-$name" '{context: $context, dockerfile: $dockerfile, suffix: $suffix}')
                 matrix=$(jq -c --argjson obj "$obj" '. + [$obj]' <<<"$matrix")
