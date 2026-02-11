@@ -23,13 +23,12 @@ jobs:
           echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
 
       - name: Delete old packages
-        uses: snok/container-retention-policy@v1
+        uses: snok/container-retention-policy@v3.0.1
         with:
           image-names: ${{ steps.extract_package_name.outputs.package_name }}
-          cut-off: 1 hour ago UTC-4
+          cut-off: 4h
           timestamp-to-use: updated_at
-          account-type: org
-          org-name: victoryguide
-          keep-at-least: 1
+          account: victoryguide
+          keep-n-most-recent: 3
           skip-tags: latest
           token: ${{ secrets.gha-pkg-token }}

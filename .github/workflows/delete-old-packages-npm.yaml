@@ -24,9 +24,10 @@ jobs:
           echo "package_name=${package_name}" >> "$GITHUB_OUTPUT"
 
       - name: Delete old packages
-        uses: actions/delete-package-versions@v3
+        uses: actions/delete-package-versions@v5
         with:
           token: ${{ secrets.gha-pkg-token }}
+          package-type: npm
           package-name: ${{ steps.extract_package_name.outputs.package_name }}
           min-versions-to-keep: 10
           ignore-versions: ":latest"

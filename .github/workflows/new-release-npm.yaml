@@ -32,21 +32,21 @@ jobs:
       changelog: ${{ steps.version-info.outputs.changelog }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.branch }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://npm.pkg.github.com"
           cache: "npm"
 
-      - uses: fregante/setup-git-user@v1
+      - uses: fregante/setup-git-user@v2.0.2
 
       - name: Get new version information
         id: version-info
-        uses: mathieudutour/github-tag-action@v5.1
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: ${{ inputs.branch }}
