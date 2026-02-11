@@ -168,10 +168,8 @@ jobs:
       - build-and-push-docker-images
     steps:
       - name: Create a GitHub release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.build-and-publish-new-release.outputs.new_tag }}
-          release_name: Release ${{ needs.build-and-publish-new-release.outputs.new_tag }}
+          name: Release ${{ needs.build-and-publish-new-release.outputs.new_tag }}
           body: ${{ needs.build-and-publish-new-release.outputs.changelog }}
