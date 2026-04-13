@@ -2,6 +2,10 @@ name: Create new release for docker repo
 
 on:
   workflow_call:
+    outputs:
+      new_version:
+        description: "The new version number produced by this release"
+        value: ${{ jobs.build-and-publish-new-release.outputs.new_version }}  
     inputs:
       branch:
         description: "The branch to create a release from"
